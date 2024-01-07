@@ -1,4 +1,4 @@
-baseurl = "/"
+baseurl = "https://blog.inugasky.net"
 languageCode = "en-us"
 theme = "hugo-book"
 paginate = 5
