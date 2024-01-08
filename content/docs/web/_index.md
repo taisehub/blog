@@ -13,7 +13,7 @@ inportuna totidemque nympha fert; repetens pendent, poenarum guttura sed vacet
 non, mortali undas. Omnis pharetramque gramen portentificisque membris servatum
 novabis fallit de nubibus atque silvas mihi. **Dixit repetitaque Quid**; verrit
 longa; sententia [mandat](http://pastor-ad.io/questussilvas) quascumque nescio
-solebat [litore](./page-one.md); noctes. *Hostem haerentem* circuit
+solebat [litore](./path_normalization/_index.md); noctes. *Hostem haerentem* circuit
 [plenaque tamen](http://www.sine.io/in).
 
 - Pedum ne indigenae finire invergens carpebat
