@@ -3,5 +3,5 @@ headless = true
 +++
 
 - [Web Security]({{< relref "/docs/web" >}})
-    - [Path normalizationの挙動]({{< relref "/docs/web/path_normalization" >}})
+    - [BeautifulSoupの怪しい挙動]({{< relref "/docs/web/beautifulsoup" >}})
 - [Other]({{< relref "/other" >}})
