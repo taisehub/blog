@@ -3,5 +3,4 @@ headless = true
 +++
 
 - [Web Security]({{< relref "/docs/web" >}})
-    - [BeautifulSoupのパーサについて]({{< relref "/docs/web/beautifulsoup" >}})
-- [Other]({{< relref "/other" >}})
+    - [Referer based Redirection as a Gadget]({{< relref "/docs/web/referer-based-redirection" >}})

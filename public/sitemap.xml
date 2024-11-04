@@ -2,12 +2,18 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
+    <loc>https://blog.inugasky.net/docs/other/</loc>
+  </url><url>
+    <loc>https://blog.inugasky.net/docs/web/beautifulsoup/</loc>
+  </url><url>
     <loc>https://blog.inugasky.net/</loc>
     <priority>0</priority>
   </url><url>
+    <loc>https://blog.inugasky.net/docs/web/</loc>
+  </url><url>
     <loc>https://blog.inugasky.net/categories/</loc>
   </url><url>
-    <loc>https://blog.inugasky.net/</loc>
+    <loc>https://blog.inugasky.net/docs/</loc>
   </url><url>
     <loc>https://blog.inugasky.net/tags/</loc>
   </url>

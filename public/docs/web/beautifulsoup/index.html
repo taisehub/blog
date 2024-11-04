@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en-us" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Introduction # During a recent bug bounty program, I discovered a gadget that can be exploited in authentication flows involving redirects with sensitive tokens, like OAuth 2.0. I haven&rsquo;t personally seen this specific gadet mentioned in any articles, so while it may already be a known technique, I decided to write this blog post.
+Redirection chaining for Authorization Token Theft # In OAuth 2.0, failing to properly validation the redirect URI can lead to serious security issue where the authorization code can be compromised.">
+<meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff">
+<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#343a40">
+<meta name="color-scheme" content="light dark"><meta property="og:title" content="Self Open Redirection as a Gadget" />
+<meta property="og:description" content="" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://blog.inugasky.net/docs/web/beautifulsoup/" />
+<title>Self Open Redirection as a Gadget | Inugasky&#39;s blog</title>
+<link rel="manifest" href="/manifest.json">
+<link rel="icon" href="/favicon.png" >
+<link rel="stylesheet" href="/book.min.4f0117e74e5337280f18eb9641eae520cb4b25adcf5dd64fafad4664145a5957.css" integrity="sha256-TwEX505TNygPGOuWQerlIMtLJa3PXdZPr61GZBRaWVc=" crossorigin="anonymous">
+  <script defer src="/flexsearch.min.js"></script>
+  <script defer src="/en.search.min.f35205a08ae39ef0c32d600f0f9dfc0ee85d5e6ca390c16440f2756adb460c3a.js" integrity="sha256-81IFoIrjnvDDLWAPD538DuhdXmyjkMFkQPJ1attGDDo=" crossorigin="anonymous"></script>
+
+  <script defer src="/sw.min.88f1afdaf4798d7d3520420dcfe201f928c3d371fdedfc3ae28cd9b6b79544f8.js" integrity="sha256-iPGv2vR5jX01IEINz&#43;IB&#43;SjD03H97fw64ozZtreVRPg=" crossorigin="anonymous"></script>
+<link rel="alternate" type="application/rss+xml" href="https://blog.inugasky.net/docs/web/beautifulsoup/index.xml" title="Inugasky's blog" />
+<!--
+Made with Book Theme
+https://github.com/alex-shpak/hugo-book
+-->
+  
+</head>
+<body dir="ltr">
+  <input type="checkbox" class="hidden toggle" id="menu-control" />
+  <input type="checkbox" class="hidden toggle" id="toc-control" />
+  <main class="container flex">
+    <aside class="book-menu">
+      <div class="book-menu-content">
+        
+  <nav>
+<h2 class="book-brand">
+  <a class="flex align-center" href="/"><img src="/logo.png" alt="Logo" /><span>Inugasky&#39;s blog</span>
+  </a>
+</h2>
+
+
+<div class="book-search">
+  <input type="text" id="book-search-input" placeholder="Search" aria-label="Search" maxlength="64" data-hotkeys="s/" />
+  <div class="book-search-spinner hidden"></div>
+  <ul id="book-search-results"></ul>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+  <ul>
+<li>
+  <a href="/docs/web/">Web Security</a>
+<ul>
+<li>
+  <a href="/docs/web/beautifulsoup/"class=active>BeautifulSoupのパーサについて</a></li>
+</ul>
+</li>
+<li>
+  <a href="/docs/other/">Other</a></li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+</nav>
+
+
+
+
+  <script>(function(){var e=document.querySelector("aside .book-menu-content");addEventListener("beforeunload",function(){localStorage.setItem("menu.scrollTop",e.scrollTop)}),e.scrollTop=localStorage.getItem("menu.scrollTop")})()</script>
+
+
+ 
+      </div>
+    </aside>
+
+    <div class="book-page">
+      <header class="book-header">
+        
+  <div class="flex align-center justify-between">
+  <label for="menu-control">
+    <img src="/svg/menu.svg" class="book-icon" alt="Menu" />
+  </label>
+
+  <strong>Self Open Redirection as a Gadget</strong>
+
+  <label for="toc-control">
+    
+    <img src="/svg/toc.svg" class="book-icon" alt="Table of Contents" />
+    
+  </label>
+</div>
+
+
+  
+  <aside class="hidden clearfix">
+    
+  
+<nav id="TableOfContents">
+  <ul>
+    <li><a href="#introduction">Introduction</a></li>
+    <li><a href="#redirection-chaining-for-authorization-token-theft">Redirection chaining for Authorization Token Theft</a></li>
+    <li><a href="#referer-based-open-redirection">Referer based Open Redirection</a></li>
+  </ul>
+</nav>
+
+
+
+  </aside>
+  
+ 
+      </header>
+
+      
+      
+  <article class="markdown book-article"><h2 id="introduction">
+  Introduction
+  <a class="anchor" href="#introduction">#</a>
+</h2>
+<p>During a recent bug bounty program, I discovered a gadget that can be exploited in authentication flows involving redirects with sensitive tokens, like OAuth 2.0.
+I haven&rsquo;t personally seen this specific gadet mentioned in any articles, so while it may already be a known technique, I decided to write this blog post.</p>
+<h2 id="redirection-chaining-for-authorization-token-theft">
+  Redirection chaining for Authorization Token Theft
+  <a class="anchor" href="#redirection-chaining-for-authorization-token-theft">#</a>
+</h2>
+<p>In OAuth 2.0, failing to properly validation the redirect URI can lead to serious security issue where the authorization code can be compromised.</p>
+<p>It&rsquo;s uncommon to have zero validation for main apps in bug bounty programs, but there are cases where arbitrary values can be specified for paths or subdomains.</p>
+<p>In such cases, it is possible to chain another server-side open redirect in permitted paths or subdomains, which can lead to token theft.</p>
+<p>(Just to note, there are certain conditions: the token must be placed in the URL fragment during the redirect chain.)</p>
+<h2 id="referer-based-open-redirection">
+  Referer based Open Redirection
+  <a class="anchor" href="#referer-based-open-redirection">#</a>
+</h2>
+<p>I was at the following condition:</p>
+<ul>
+<li>If already authenticated, accessing <code>https://accounts.example.com/auth?redirect_url=https://accounts.example.com/token</code> results in a 302 redirection to <code>https://accounts.example.com/token?token=aaaaaaa</code>. This token can be exchanged for a session tied to this token.</li>
+<li>Arbitrary paths can be specified under <code>accounts.example.com</code> in the <code>redirect_url</code>.</li>
+<li>The <code>%23</code> specified in the <code>redirect_url</code> will be decoded, allowing a fragment to be added to the <code>Location</code> header.</li>
+</ul>
+<p>So, I wanted a server-side open redirect in <code>accounts.example.com</code>.
+After some investigation, I found that if there is an authentication error due to the absence of a <code>code</code> params in <code>https://accounts.example.com/google/link</code> which is the endpoint for linking google account, it redirects with a 302 status to the value specified in the <code>Referer</code> header.</p>
+<p>Generally, <code>Referer</code> based open redirect are considered either &ldquo;self&rdquo; open redirect or meaningless open redirects since they require passing through the attacker’s site at least once.</p>
+<figure class="center"><img src="./referer-based.OR.png"/>
+</figure>
+
+<p>However, I realized that when integrate into such a exploit chain, <code>Referer</code> based open redirect can be valuable.</p>
+<p>Below is a diagram.</p>
+</article>
+ 
+      
+
+      <footer class="book-footer">
+        
+  <div class="flex flex-wrap justify-between">
+
+
+
+
+  <div>
+    <a class="flex align-center" href="https://github.com/taisehub/blog/edit/master/exampleSite/content/docs/web/beautifulsoup/_index.md" target="_blank" rel="noopener">
+      <img src="/svg/edit.svg" class="book-icon" alt="Edit" />
+      <span>Edit this page</span>
+    </a>
+  </div>
+
+
+</div>
+
+
+
+  <script>(function(){function e(e){const t=window.getSelection(),n=document.createRange();n.selectNodeContents(e),t.removeAllRanges(),t.addRange(n)}document.querySelectorAll("pre code").forEach(t=>{t.addEventListener("click",function(){if(window.getSelection().toString())return;e(t.parentElement),navigator.clipboard&&navigator.clipboard.writeText(t.parentElement.textContent)})})})()</script>
+
+
+ 
+        
+      </footer>
+
+      
+  
+  <div class="book-comments">
+
+</div>
+  
+ 
+
+      <label for="menu-control" class="hidden book-menu-overlay"></label>
+    </div>
+
+    
+    <aside class="book-toc">
+      <div class="book-toc-content">
+        
+  
+<nav id="TableOfContents">
+  <ul>
+    <li><a href="#introduction">Introduction</a></li>
+    <li><a href="#redirection-chaining-for-authorization-token-theft">Redirection chaining for Authorization Token Theft</a></li>
+    <li><a href="#referer-based-open-redirection">Referer based Open Redirection</a></li>
+  </ul>
+</nav>
+
+
+ 
+      </div>
+    </aside>
+    
+  </main>
+
+  
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+

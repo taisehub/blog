@@ -3,6 +3,12 @@ languageCode = "en-us"
 theme = "hugo-book"
 paginate = 5
 title = "Inugasky's blog"
+
+[markup]
+  [markup.goldmark]
+    [markup.goldmark.renderer]
+      unsafe = true
+
 [params]
   subtitle = 'The Best Widgets on Earth'
 
