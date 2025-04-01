@@ -2,7 +2,6 @@
 headless = true
 +++
 
-- [Web Security]({{< relref "/docs/web" >}})
+- [Web]({{< relref "/docs/web" >}})
     - [Referer based Redirection as a Gadget]({{< relref "/docs/web/referer-based-redirection" >}})
-- [Windows]({{< relref "/docs/windows" >}})
-    - [名前付きパイプの解析 その1]({{< relref "/docs/windows/namedPipe1" >}})
+    - [Writeup: Intigriti's Challenge 0325]({{< relref "/docs/web/intigriti-0325" >}})

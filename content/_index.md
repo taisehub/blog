@@ -1,3 +1,7 @@
 # U・ᴥ・U
-主にセキュリティの話をしたい。  
-作りたてなので記事はまだ無いです。
+
+. .   
+し  
+▽
+
+I’m a bug hunter. You can find me on X as [@1_am_nek0](https://x.com/1_am_nek0).
